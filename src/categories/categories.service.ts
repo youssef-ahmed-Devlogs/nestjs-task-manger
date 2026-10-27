@@ -1,7 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Category } from './schemas/category.schema.js';
-import { Model, Types } from 'mongoose';
+import { Model, mongo, Types } from 'mongoose';
 import { PaginatedDto } from '../common/dto/paginated.dto.js';
 import { CreateCategoryDto } from './dto/create-category.dto.js';
 import { UpdateCategoryDto } from './dto/update-category.dto.js';
@@ -12,9 +16,19 @@ export class CategoriesService {
     @InjectModel(Category.name) private readonly categoryModel: Model<Category>,
   ) {}
 
-  create(createCategoryDto: CreateCategoryDto): Promise<Category> {
-    const createdCategory = new this.categoryModel(createCategoryDto);
-    return createdCategory.save();
+  async create(createCategoryDto: CreateCategoryDto): Promise<Category> {
+    try {
+      const createdCategory = new this.categoryModel(createCategoryDto);
+      return await createdCategory.save();
+    } catch (error) {
+      if (error instanceof mongo.MongoServerError && error.code === 11000) {
+        throw new ConflictException(
+          `Category ${createCategoryDto.name} already exists`,
+        );
+      }
+
+      throw error;
+    }
   }
 
   async findAll(page: number, limit: number): Promise<PaginatedDto<Category>> {
@@ -44,17 +58,26 @@ export class CategoriesService {
     id: Types.ObjectId,
     updateCategoryDto: UpdateCategoryDto,
   ): Promise<Category> {
-    const category = await this.categoryModel
-      .findByIdAndUpdate(id, updateCategoryDto, {
-        returnDocument: 'after',
-      })
-      .exec();
+    try {
+      const category = await this.categoryModel
+        .findByIdAndUpdate(id, updateCategoryDto, {
+          returnDocument: 'after',
+        })
+        .exec();
 
-    if (!category) {
-      throw new NotFoundException(`Category ${id} not found`);
+      if (!category) {
+        throw new NotFoundException(`Category ${id} not found`);
+      }
+
+      return category;
+    } catch (error) {
+      if (error instanceof mongo.MongoServerError && error.code === 11000) {
+        throw new ConflictException(
+          `Category ${updateCategoryDto.name} already exists`,
+        );
+      }
+      throw error;
     }
-
-    return category;
   }
 
   async remove(id: Types.ObjectId): Promise<void> {
