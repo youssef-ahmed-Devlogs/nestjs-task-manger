@@ -1,0 +1,25 @@
+info:
+  name: find-all-categories
+  type: http
+  seq: 2
+
+http:
+  method: GET
+  url: http://localhost:3000/categories
+  params:
+    - name: page
+      value: "2"
+      type: query
+      disabled: true
+    - name: limit
+      value: "5"
+      type: query
+      disabled: true
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false

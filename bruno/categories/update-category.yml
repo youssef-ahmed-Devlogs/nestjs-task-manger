@@ -1,0 +1,22 @@
+info:
+  name: update-category
+  type: http
+  seq: 4
+
+http:
+  method: PATCH
+  url: http://localhost:3000/categories/6ae0e6c8c8bae97cfa1aed68
+  body:
+    type: json
+    data: |-
+      {
+        "name":"Work"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
