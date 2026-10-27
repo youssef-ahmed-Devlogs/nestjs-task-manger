@@ -1,11 +1,13 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller.js';
-import { AppService } from './app.service.js';
 import { MongooseModule } from '@nestjs/mongoose';
+import { CategoriesModule } from './categories/categories.module.js';
 
 @Module({
-  imports: [MongooseModule.forRoot('mongodb://127.0.0.1:27017/task-manager')],
-  controllers: [AppController],
-  providers: [AppService],
+  imports: [
+    MongooseModule.forRoot('mongodb://127.0.0.1:27017/task-manager'),
+    CategoriesModule,
+  ],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}
