@@ -16,6 +16,7 @@ import { CreateCategoryDto } from './dto/create-category.dto.js';
 import { UpdateCategoryDto } from './dto/update-category.dto.js';
 import { ParseObjectIdPipe } from '@nestjs/mongoose';
 import { Types } from 'mongoose';
+import { PaginationQueryDto } from '../common/dto/pagination-query.dto.js';
 
 @Controller('categories')
 export class CategoriesController {
@@ -28,10 +29,15 @@ export class CategoriesController {
 
   @Get()
   findAll(
-    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
-    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
+    // @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    // @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
+    @Query() paginationQueryDto: PaginationQueryDto,
   ) {
-    return this.categoriesService.findAll(page, limit);
+    console.log(
+      paginationQueryDto instanceof PaginationQueryDto,
+      paginationQueryDto,
+    );
+    return this.categoriesService.findAll(paginationQueryDto);
   }
 
   @Get(':id')

@@ -9,6 +9,7 @@ import { Model, mongo, Types } from 'mongoose';
 import { PaginatedDto } from '../common/dto/paginated.dto.js';
 import { CreateCategoryDto } from './dto/create-category.dto.js';
 import { UpdateCategoryDto } from './dto/update-category.dto.js';
+import { PaginationQueryDto } from '../common/dto/pagination-query.dto.js';
 
 @Injectable()
 export class CategoriesService {
@@ -31,7 +32,11 @@ export class CategoriesService {
     }
   }
 
-  async findAll(page: number, limit: number): Promise<PaginatedDto<Category>> {
+  async findAll(
+    paginationQueryDto: PaginationQueryDto,
+  ): Promise<PaginatedDto<Category>> {
+    const { page, limit } = paginationQueryDto;
+
     const results = await this.categoryModel
       .find()
       .sort({ name: 'asc' })
